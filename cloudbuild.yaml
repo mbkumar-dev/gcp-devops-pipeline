@@ -1,17 +1,13 @@
-timeout: "1200s"  # 20 minutes
-options:
-  logging: CLOUD_LOGGING_ONLY
-
 steps:
+  # Step 1: Build Docker image for your app
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest'
       - '-f'
-      - 'path/to/Dockerfile'  # specify the relative path
-      - '.'
-
+      - 'app/Dockerfile'   # Dockerfile is inside the app folder
+      - 'app'              # Build context points to the app folder
 
   # Step 2: Push Docker image
   - name: 'gcr.io/cloud-builders/docker'
@@ -21,7 +17,6 @@ steps:
 
   # Step 3: Terraform init
   - name: 'hashicorp/terraform'
-    dir: 'terraform'
     entrypoint: 'sh'
     args:
       - '-c'
@@ -33,7 +28,6 @@ steps:
 
   # Step 4: Terraform plan
   - name: 'hashicorp/terraform'
-    dir: 'terraform'
     entrypoint: 'sh'
     args:
       - '-c'
@@ -41,3 +35,10 @@ steps:
 
   # Step 5: Terraform apply
   - name: 'hashicorp/terraform'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - terraform apply -auto-approve
+
+options:
+  logging: CLOUD_LOGGING_ONLY
