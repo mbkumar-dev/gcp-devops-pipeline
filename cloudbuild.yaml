@@ -1,30 +1,34 @@
 steps:
-# 1. Terraform Init & Apply
+# 1️⃣ Build Docker image
+- name: gcr.io/cloud-builders/docker
+  args:
+    [
+      "build",
+      "-t",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest",
+      "app"
+    ]
+
+# 2️⃣ Push Docker image
+- name: gcr.io/cloud-builders/docker
+  args:
+    [
+      "push",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest"
+    ]
+
+# 3️⃣ Terraform Init
 - name: hashicorp/terraform
   args: ["init"]
   dir: "terraform"
 
+# 4️⃣ Terraform Apply (deploy Cloud Run)
 - name: hashicorp/terraform
   args: ["apply", "-auto-approve"]
   dir: "terraform"
 
-# 2. Build Docker image in Cloud Build
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    [
-      'build',
-      '-t',
-      'us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest',
-      'app'
-    ]
-
-# 3. Push Docker image to Artifact Registry
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    [
-      'push',
-      'us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest'
-    ]
-
 images:
   - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY
