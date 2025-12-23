@@ -1,12 +1,25 @@
-from flask import Flask
-import os
+# Use a lightweight Python image
+FROM python:3.11-slim
 
-app = Flask(__name__)
+# Set working directory
+WORKDIR /app
 
-@app.route("/")
-def hello():
-    return "Hello from GCP DevOps Pipeline 🚀"
+# Copy requirements first to leverage Docker caching
+COPY requirements.txt .
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code
+COPY app.py .
+
+# Expose the default Flask port
+EXPOSE 8080
+
+# Set the environment variable for Flask
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=8080
+
+# Run the Flask app
+CMD ["flask", "run"]

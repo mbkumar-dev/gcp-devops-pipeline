@@ -3,13 +3,15 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Step 1: Build Docker image for your app
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
       - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest'
+      - '-f'
+      - 'path/to/Dockerfile'  # specify the relative path
       - '.'
+
 
   # Step 2: Push Docker image
   - name: 'gcr.io/cloud-builders/docker'
