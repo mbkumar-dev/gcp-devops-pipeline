@@ -1,45 +1,27 @@
 steps:
-  # Step 1: Build Docker image for your app (from app/ folder)
-  - name: 'gcr.io/cloud-builders/docker'
+  # Step 1: Build Docker image
+  - name: gcr.io/cloud-builders/docker
     args:
       - build
-      - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest'
-      - './app'
+      - -t
+      - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
+      - .
 
   # Step 2: Push Docker image
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest'
+      - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
 
-  # Step 3: Terraform init (in terraform/ folder)
-  - name: 'hashicorp/terraform'
-    dir: 'terraform'
-    entrypoint: 'sh'
+  # Step 3: Terraform Init
+  - name: hashicorp/terraform
+    dir: terraform
     args:
-      - '-c'
-      - |
-        terraform init \
-          -backend-config="bucket=regal-stone-481911-terraform-state" \
-          -backend-config="prefix=terraform/state" \
-          -reconfigure
+      - init
 
-  # Step 4: Terraform plan
-  - name: 'hashicorp/terraform'
-    dir: 'terraform'
-    entrypoint: 'sh'
+  # Step 4: Terraform Apply (THIS WAS MISSING)
+  - name: hashicorp/terraform
+    dir: terraform
     args:
-      - '-c'
-      - terraform plan
-
-  # Step 5: Terraform apply
-  - name: 'hashicorp/terraform'
-    dir: 'terraform'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - terraform apply -auto-approve
-
-options:
-  logging: CLOUD_LOGGING_ONLY
+      - apply
+      - -auto-approve
