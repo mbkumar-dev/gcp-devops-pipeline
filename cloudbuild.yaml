@@ -1,15 +1,57 @@
-serviceAccount: projects/regal-stone-481911-e6/serviceAccounts/cloud-build-sa@regal-stone-481911-e6.iam.gserviceaccount.com
+# =========================================================
+# Cloud Build Configuration – FINAL & CORRECT
+# =========================================================
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  machineType: E2_MEDIUM
+
+timeout: "1200s"
 
 steps:
+# ---------------------------------------------------------
+# Step 1: Build Docker Image (Dockerfile inside /app)
+# ---------------------------------------------------------
 - name: gcr.io/cloud-builders/docker
+  id: Build Docker Image
   args:
-    - build
-    - -t
-    - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
-    - .
+    [
+      "build",
+      "-t",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest",
+      "-f",
+      "app/Dockerfile",
+      "app"
+    ]
 
-images:
-- us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
+# ---------------------------------------------------------
+# Step 2: Push Docker Image to Artifact Registry
+# ---------------------------------------------------------
+- name: gcr.io/cloud-builders/docker
+  id: Push Docker Image
+  args:
+    [
+      "push",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest"
+    ]
+
+# ---------------------------------------------------------
+# Step 3: Terraform Init
+# ---------------------------------------------------------
+- name: hashicorp/terraform:1.6
+  id: Terraform Init
+  dir: terraform
+  args:
+    ["init"]
+
+# ---------------------------------------------------------
+# Step 4: Terraform Apply (auto-approve)
+# ---------------------------------------------------------
+- name: hashicorp/terraform:1.6
+  id: Terraform Apply
+  dir: terraform
+  args:
+    ["apply", "-auto-approve"]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
