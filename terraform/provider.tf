@@ -2,12 +2,13 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = "~> 5.45"
     }
   }
 }
 
+# provider.tf
 provider "google" {
-  project = var.project_id
-  region  = var.region
+  project = "regal-stone-481911-e6"
+  region  = "us-central1"
 }
