@@ -1,0 +1,31 @@
+steps:
+  # Terraform Init
+  - name: hashicorp/terraform
+    args: ["init"]
+    dir: "terraform"
+
+  # Terraform Apply
+  - name: hashicorp/terraform
+    args: ["apply", "-auto-approve"]
+    dir: "terraform"
+
+  # Build Docker image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-t",
+        "us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest",
+        "app"
+      ]
+
+  # Push image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "push",
+        "us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest"
+      ]
+
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
