@@ -1,7 +1,9 @@
 resource "google_artifact_registry_repository" "repo" {
-  location      = var.region
-  repository_id = "docker-repo"
+  project       = "regal-stone-481911-e6"
+  location      = "us-central1"
+  repository_id = "docker-repo"             # <-- REQUIRED
   format        = "DOCKER"
+  description   = "Docker repo for Cloud Run"  # optional
 }
 
 resource "google_cloud_run_v2_service" "app" {
