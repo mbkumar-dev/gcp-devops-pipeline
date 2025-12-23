@@ -23,9 +23,8 @@ steps:
   dir: "terraform"
 
 # 4️⃣ Terraform Apply (deploy Cloud Run)
-- name: hashicorp/terraform
-  args: ["apply", "-auto-approve"]
-  dir: "terraform"
+- - name: hashicorp/terraform
+    args: ["plan"]
 
 images:
   - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
