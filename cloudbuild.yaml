@@ -1,19 +1,15 @@
+serviceAccount: projects/regal-stone-481911-e6/serviceAccounts/cloud-build-sa@regal-stone-481911-e6.iam.gserviceaccount.com
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
-- id: Build
-  name: gcr.io/cloud-builders/docker
+- name: gcr.io/cloud-builders/docker
   args:
     - build
     - -t
     - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
     - .
-
-- id: Terraform Init
-  name: hashicorp/terraform:1.6
-  args: ["init"]
-
-- id: Terraform Apply
-  name: hashicorp/terraform:1.6
-  args: ["apply", "-auto-approve"]
 
 images:
 - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
