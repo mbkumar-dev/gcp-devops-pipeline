@@ -26,15 +26,6 @@ steps:
       - .
 
   # ------------------------
-  # 2️⃣ Push Docker Image
-  # ------------------------
-  - id: "Push Docker Image"
-    name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
-
-  # ------------------------
   # 3️⃣ Terraform Init
   # ------------------------
   - id: "Terraform Init"
