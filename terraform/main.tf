@@ -11,6 +11,7 @@ resource "google_cloud_run_service" "app" {
   template {
     spec {
       containers {
+        # Cloud Build will push the image here
         image = "us-central1-docker.pkg.dev/${var.project_id}/docker-repo/app:latest"
       }
     }
