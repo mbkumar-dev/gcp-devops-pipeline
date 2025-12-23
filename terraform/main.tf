@@ -1,16 +1,16 @@
+# Artifact Registry Docker repository
 resource "google_artifact_registry_repository" "repo" {
-  project       = "regal-stone-481911-e6"
-  location      = "us-central1"
   repository_id = "docker-repo"
+  location      = "us-central1"
   description   = "Docker repo for Cloud Run"
   format        = "DOCKER"
   mode          = "STANDARD_REPOSITORY"
 }
 
+# Cloud Run service
 resource "google_cloud_run_v2_service" "app" {
   name     = "devops-app"
   location = "us-central1"
-  project  = "regal-stone-481911-e6"
 
   template {
     containers {
@@ -19,8 +19,11 @@ resource "google_cloud_run_v2_service" "app" {
   }
 }
 
+# Cloud Run IAM for public access
 resource "google_cloud_run_v2_service_iam_member" "public" {
-  name     = "projects/regal-stone-481911-e6/locations/us-central1/services/devops-app"
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.app.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }

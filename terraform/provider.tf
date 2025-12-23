@@ -7,7 +7,6 @@ terraform {
   }
 }
 
-# provider.tf
 provider "google" {
   project = "regal-stone-481911-e6"
   region  = "us-central1"
