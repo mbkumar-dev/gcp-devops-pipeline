@@ -15,6 +15,7 @@ steps:
 
   # Step 3: Terraform init
   - name: 'hashicorp/terraform'
+    dir: 'terraform'
     entrypoint: 'sh'
     args:
       - '-c'
@@ -26,6 +27,7 @@ steps:
 
   # Step 4: Terraform plan
   - name: 'hashicorp/terraform'
+    dir: 'terraform'
     entrypoint: 'sh'
     args:
       - '-c'
@@ -33,9 +35,12 @@ steps:
 
   # Step 5: Terraform apply
   - name: 'hashicorp/terraform'
+    dir: 'terraform'
     entrypoint: 'sh'
     args:
       - '-c'
       - terraform apply -auto-approve
 
-timeout: 1200s
+options:
+  logging: CLOUD_LOGGING_ONLY
+  timeout: 1200s
