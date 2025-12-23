@@ -1,10 +1,6 @@
-# =========================
-# Cloud Build Configuration
-# =========================
-
 serviceAccount: projects/$PROJECT_ID/serviceAccounts/cloud-build-sa@$PROJECT_ID.iam.gserviceaccount.com
 
-timeout: "1200s" # 20 minutes (Terraform + Docker safe margin)
+timeout: "1200s"
 
 substitutions:
   _REGION: us-central1
@@ -22,6 +18,7 @@ steps:
   # ------------------------
   - id: "Build Docker Image"
     name: gcr.io/cloud-builders/docker
+    dir: app
     args:
       - build
       - "-t"
@@ -29,7 +26,7 @@ steps:
       - .
 
   # ------------------------
-  # 2️⃣ Push Image to Artifact Registry
+  # 2️⃣ Push Docker Image
   # ------------------------
   - id: "Push Docker Image"
     name: gcr.io/cloud-builders/docker
@@ -58,8 +55,5 @@ steps:
       - "-auto-approve"
       - "-input=false"
 
-# =========================
-# Images Produced (Metadata)
-# =========================
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
