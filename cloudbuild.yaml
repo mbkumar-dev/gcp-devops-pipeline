@@ -1,27 +1,65 @@
+# =========================
+# Cloud Build Configuration
+# =========================
+
+serviceAccount: projects/$PROJECT_ID/serviceAccounts/cloud-build-sa@$PROJECT_ID.iam.gserviceaccount.com
+
+timeout: "1200s" # 20 minutes (Terraform + Docker safe margin)
+
+substitutions:
+  _REGION: us-central1
+  _REPO: docker-repo
+  _IMAGE: app
+  _TERRAFORM_DIR: terraform
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
 steps:
-  # Step 1: Build Docker image
-  - name: gcr.io/cloud-builders/docker
+  # ------------------------
+  # 1️⃣ Build Docker Image
+  # ------------------------
+  - id: "Build Docker Image"
+    name: gcr.io/cloud-builders/docker
     args:
       - build
-      - -t
-      - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
       - .
 
-  # Step 2: Push Docker image
-  - name: gcr.io/cloud-builders/docker
+  # ------------------------
+  # 2️⃣ Push Image to Artifact Registry
+  # ------------------------
+  - id: "Push Docker Image"
+    name: gcr.io/cloud-builders/docker
     args:
       - push
-      - us-central1-docker.pkg.dev/$PROJECT_ID/docker-repo/app:latest
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
 
-  # Step 3: Terraform Init
-  - name: hashicorp/terraform
-    dir: terraform
+  # ------------------------
+  # 3️⃣ Terraform Init
+  # ------------------------
+  - id: "Terraform Init"
+    name: hashicorp/terraform:1.6
+    dir: "${_TERRAFORM_DIR}"
     args:
       - init
+      - "-input=false"
 
-  # Step 4: Terraform Apply (THIS WAS MISSING)
-  - name: hashicorp/terraform
-    dir: terraform
+  # ------------------------
+  # 4️⃣ Terraform Apply
+  # ------------------------
+  - id: "Terraform Apply"
+    name: hashicorp/terraform:1.6
+    dir: "${_TERRAFORM_DIR}"
     args:
       - apply
-      - -auto-approve
+      - "-auto-approve"
+      - "-input=false"
+
+# =========================
+# Images Produced (Metadata)
+# =========================
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest"
