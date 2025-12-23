@@ -1,3 +1,7 @@
+timeout: "1200s"  # 20 minutes
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Step 1: Build Docker image for your app
   - name: 'gcr.io/cloud-builders/docker'
@@ -35,12 +39,3 @@ steps:
 
   # Step 5: Terraform apply
   - name: 'hashicorp/terraform'
-    dir: 'terraform'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - terraform apply -auto-approve
-
-options:
-  logging: CLOUD_LOGGING_ONLY
-  timeout: 1200s
